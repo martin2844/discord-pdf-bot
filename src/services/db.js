@@ -1,9 +1,10 @@
 const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 let db;
 
 const init = () => {
   db = new sqlite3.Database(
-    '../books.db',
+    path.resolve(__dirname, '../../books.db'),
     sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
     (err) => {
       if (err) {

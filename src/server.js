@@ -1,8 +1,10 @@
 const path = require('path');
 const express = require('express');
+const { init } = require('./services/books');
 require('dotenv').config();
-const app = express();
 
+const app = express();
+init().then(() => console.log('Initialized discord client'));
 const controllers = require('./controllers');
 
 controllers.forEach((c) => app.use(c.path, c.handler));

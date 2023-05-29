@@ -5,7 +5,7 @@ const db = require('../services/db.js');
 const { refreshBooks } = require('../services/books.js');
 
 router.get('/all', (req, res) => {
-  db.all('SELECT * FROM books', [], (err, rows) => {
+  db.all('SELECT * FROM books ORDER BY date DESC', [], (err, rows) => {
     if (err) {
       throw err;
     }
