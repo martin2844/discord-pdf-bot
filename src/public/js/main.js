@@ -38,7 +38,18 @@ document.getElementById('refresh-btn').addEventListener('click', function () {
         <div class="card my-2">
           <div class="card-body">
             <h5 class="card-title">${title}</h5>
-            <p class="card-text">Contribution by <strong>${book.name}</strong></p>
+              <div class="d-flex align-items-center mb-2">
+                            <img src="${
+                              book.avatar
+                                ? book.avatar
+                                : 'https://cdn.discordapp.com/avatars/411155469504217089/8b5b4f2f047b7a6986bdc7e78c306b6e.webp'
+                            }" alt="${
+          book.name
+        }'s avatar" class="img-thumbnail me-2" style="width: 50px; height: 50px;">
+                            <p class="card-text mb-0">Contribution by <strong>${
+                              book.name
+                            }</strong></p>
+                        </div> 
             <p class="card-text">${formattedDate}</p>
             <a href="${book.file}" class="btn btn-primary">Download Book</a>
           </div>
