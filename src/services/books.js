@@ -64,11 +64,12 @@ const refreshBooks = async () => {
             if (msg.attachments.size > 0) {
               msg.attachments.forEach((attachment) => {
                 if (attachment.name.endsWith('.pdf')) {
+                  getAndSaveAvatar(client, msg.author.id, msg.author.tag);
                   const stmt = db.prepare(
-                    'INSERT INTO books (uploader, date, file) VALUES (?, ?, ?)',
+                    'INSERT INTO books (uploader_id, date, file) VALUES (?, ?, ?)',
                   );
                   stmt.run(
-                    msg.author.tag,
+                    msg.author.id,
                     msg.createdAt.toISOString(),
                     attachment.url,
                   );
@@ -91,6 +92,30 @@ const refreshBooks = async () => {
       },
     );
   });
+};
+
+const getAndSaveAvatar = async (client, uploaderId, uploader_name) => {
+  try {
+    // Fetch the user from the client's cache
+    const user = await client.users.fetch(uploaderId);
+    if (!user) {
+      console.error(`User with ID ${uploaderId} not found.`);
+      return;
+    }
+
+    // Get the user's avatar URL. Discord.js provides the User.displayAvatarURL() method for this.
+    const avatarUrl = user.displayAvatarURL();
+
+    // Insert the user's ID and avatar URL into the uploaders table
+    const stmt = db.prepare(
+      'INSERT OR IGNORE INTO uploaders (uploader_id, name, avatar) VALUES (?, ?, ?)',
+    );
+    stmt.run(uploaderId, uploader_name, avatarUrl);
+    stmt.finalize();
+    console.log(`Avatar URL for ${uploaderId} saved to the database.`);
+  } catch (error) {
+    console.error(`Error getting avatar for ${uploaderId}: ${error}`);
+  }
 };
 
 module.exports = {

@@ -14,11 +14,18 @@ const init = () => {
     },
   );
   // Create table if it doesn't exist
+  db.run(`CREATE TABLE IF NOT EXISTS uploaders (
+  name TEXT PRIMARY KEY,
+  uploader_id TEXT NOT NULL,
+  avatar TEXT NOT NULL
+)`);
+
   db.run(`CREATE TABLE IF NOT EXISTS books (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  uploader TEXT NOT NULL,
+  uploader_id TEXT NOT NULL,
   date TEXT NOT NULL,
-  file TEXT NOT NULL
+  file TEXT NOT NULL,
+  FOREIGN KEY(uploader_id) REFERENCES uploaders(uploader_id)
 )`);
 };
 

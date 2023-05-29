@@ -38,7 +38,7 @@ document.getElementById('refresh-btn').addEventListener('click', function () {
         <div class="card my-2">
           <div class="card-body">
             <h5 class="card-title">${title}</h5>
-            <p class="card-text">Contribution by <strong>${book.uploader}</strong></p>
+            <p class="card-text">Contribution by <strong>${book.name}</strong></p>
             <p class="card-text">${formattedDate}</p>
             <a href="${book.file}" class="btn btn-primary">Download Book</a>
           </div>
