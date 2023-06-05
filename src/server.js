@@ -1,7 +1,12 @@
 const path = require('path');
 const express = require('express');
+const Bree = require('bree');
+const BreConfig = require('./jobs');
 const { init } = require('./services/books');
 require('dotenv').config();
+
+const bree = new Bree(BreConfig);
+bree.start();
 
 const app = express();
 init().then(() => console.log('Initialized discord client'));

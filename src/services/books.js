@@ -1,4 +1,6 @@
 require('dotenv').config();
+const axios = require('axios');
+const PDFParser = require('pdf-parse');
 const Discord = require('discord.js');
 const client = new Discord.Client({ intents: [1, 512] });
 const db = require('./db.js');
@@ -8,6 +10,61 @@ const token = process.env.BOT_TOKEN;
 const init = async () => {
   console.log('Initializing discord client');
   await client.login(token); // Replace with your bot token
+};
+
+const getAllBooks = () => {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM books', [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+const getBooksWithoutDetails = () => {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `
+      SELECT books.id, books.file
+      FROM books
+      LEFT JOIN book_details ON books.id = book_details.book_id
+      WHERE book_details.book_id IS NULL
+      `,
+      [],
+      (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      },
+    );
+  });
+};
+
+const getAllBooksAndDetails = () => {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `
+      SELECT *
+      FROM books
+      INNER JOIN uploaders ON books.uploader_id = uploaders.uploader_id
+      INNER JOIN book_details ON books.id = book_details.book_id
+      ORDER BY date DESC`,
+      [],
+      (err, rows) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      },
+    );
+  });
 };
 
 const refreshBooks = async () => {
@@ -118,7 +175,59 @@ const getAndSaveAvatar = async (client, uploaderId, uploader_name) => {
   }
 };
 
+const getMetaDataFromPdf = async (url) => {
+  try {
+    // Download the PDF file from the URL
+    const response = await axios.get(url, {
+      responseType: 'arraybuffer',
+    });
+    const pdfBuffer = response.data;
+
+    // Parse PDF data
+    const pdf = await PDFParser(pdfBuffer);
+    const { info } = pdf;
+    const author = info.Author;
+    const title = info.Title;
+    return {
+      file: url,
+      author,
+      title,
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const saveBookDetails = async (bookId, title, author, subject, keywords) => {
+  return new Promise((resolve, reject) => {
+    db.run(
+      `
+      INSERT INTO book_details (book_id, title, author, subject, keywords)
+      VALUES (?, ?, ?, ?, ?)
+      `,
+      [bookId, title, author, subject, keywords],
+      function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(this.lastID);
+        }
+      },
+    );
+  });
+};
+
+// getMetaDataFromPdf(
+//   'https://cdn.discordapp.com/attachments/805973548924403722/994247168196087838/Python_Tricks_A_Buffet_of_Awesome_Python_Features.pdf',
+// );
+
 module.exports = {
   refreshBooks,
+  getAllBooks,
+  getAllBooksAndDetails,
+  getBooksWithoutDetails,
+  getMetaDataFromPdf,
+  saveBookDetails,
+  getMetaDataFromPdf,
   init,
 };

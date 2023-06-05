@@ -27,6 +27,16 @@ const init = () => {
   file TEXT NOT NULL,
   FOREIGN KEY(uploader_id) REFERENCES uploaders(uploader_id)
 )`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS book_details (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  book_id INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  author TEXT NOT NULL,
+  subject TEXT,
+  keywords TEXT,
+  FOREIGN KEY(book_id) REFERENCES books(id)
+)`);
 };
 
 init();
