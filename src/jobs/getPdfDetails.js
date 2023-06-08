@@ -1,25 +1,11 @@
 const { parentPort } = require('worker_threads');
-const {
-  getBooksWithoutDetails,
-  getMetaDataFromPdf,
-  saveBookDetails,
-} = require('../services/books');
+const { getPdfDetailsForAllBooks } = require('../services/books');
 
 (async () => {
   console.log('RUNNING CRON FOR PDF DETAILS');
   //Get all Books.
   try {
-    const booksWithoutDetails = await getBooksWithoutDetails();
-    for (const book of booksWithoutDetails) {
-      const metadata = await getMetaDataFromPdf(book.file);
-      await saveBookDetails(
-        book.id,
-        metadata.title,
-        metadata.author,
-        '',
-        'keywords',
-      );
-    }
+    await getPdfDetailsForAllBooks();
   } catch (error) {
     console.log(error);
   }

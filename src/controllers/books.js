@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 const db = require('../services/db.js');
-const { refreshBooks } = require('../services/books.js');
+const {
+  refreshBooks,
+  getPdfDetailsForAllBooks,
+} = require('../services/books.js');
 
 router.get('/all', (req, res) => {
   db.all(
@@ -24,6 +27,11 @@ router.get('/all', (req, res) => {
 router.get('/refresh', async (req, res) => {
   await refreshBooks();
   res.send('Books refreshed');
+});
+
+router.get('/refresh/details', async (req, res) => {
+  getPdfDetailsForAllBooks();
+  res.send('refreshing details');
 });
 
 module.exports = router;

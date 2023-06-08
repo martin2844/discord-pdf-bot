@@ -67,6 +67,31 @@ const getAllBooksAndDetails = () => {
   });
 };
 
+let running = false;
+const getPdfDetailsForAllBooks = async () => {
+  if (running) {
+    console.log('Already running');
+    return;
+  }
+  running = true;
+  const booksWithoutDetails = await getBooksWithoutDetails();
+  for (const book of booksWithoutDetails) {
+    try {
+      const metadata = await getMetaDataFromPdf(book.file);
+      if (!metadata || !metadata.title || !metadata.author) {
+        console.log('No MetaData for this one');
+        await saveBookDetails(book.id, '', '', '', '');
+        continue;
+      }
+      console.log('Saving Metadata for ' + metadata.title);
+      await saveBookDetails(book.id, metadata.title, metadata.author, '', '');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  running = false;
+};
+
 const refreshBooks = async () => {
   console.log('refreshing');
   // Check if the client is ready
@@ -226,6 +251,7 @@ module.exports = {
   getAllBooks,
   getAllBooksAndDetails,
   getBooksWithoutDetails,
+  getPdfDetailsForAllBooks,
   getMetaDataFromPdf,
   saveBookDetails,
   getMetaDataFromPdf,
